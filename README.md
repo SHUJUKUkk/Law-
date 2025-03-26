@@ -1,6 +1,6 @@
 # 爱律
 一个基于Spring Boot的法律咨询系统，集成了用户认证、权限管理和AI辅助咨询等功能。
-——_「AI赋正义，律定规则」_
+——_「AI赋正义，律定规则」_  
 
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.7.3-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Java](https://img.shields.io/badge/Java-8-orange.svg)](https://www.java.com)
