@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>用户管理</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-4">
+    <h2>用户列表</h2>
+    <a th:href="@{/admin/users/add}" class="btn btn-primary mb-3">添加用户</a>
+    
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>用户名</th>
+                <th>邮箱</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="user : ${users}">
+                <td th:text="${user.username}"></td>
+                <td th:text="${user.email}"></td>
+                <td>
+                    <a th:href="@{/admin/users/edit/{id}(id=${user.id})}" class="btn btn-sm btn-warning">编辑</a>
+                    <a th:href="@{/admin/users/delete/{id}(id=${user.id})}" class="btn btn-sm btn-danger">删除</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
