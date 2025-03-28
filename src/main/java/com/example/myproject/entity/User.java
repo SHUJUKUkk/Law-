@@ -33,6 +33,9 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String roles;
 
+    @Column(nullable = false)
+    private boolean blacklisted = false;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         String[] roleArray = roles.split(",");

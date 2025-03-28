@@ -25,10 +25,109 @@
                 <td>
                     <a th:href="@{/admin/users/edit/{id}(id=${user.id})}" class="btn btn-sm btn-warning">编辑</a>
                     <a th:href="@{/admin/users/delete/{id}(id=${user.id})}" class="btn btn-sm btn-danger">删除</a>
+                    <form th:action="@{/admin/users/{id}/blacklist(id=${user.id})}" method="post" style="display: inline;" th:if="${!user.blacklisted}">
+                        <button type="submit" class="btn btn-sm btn-dark">加入黑名单</button>
+                    </form>
+                    <form th:action="@{/admin/users/{id}/unblacklist(id=${user.id})}" method="post" style="display: inline;" th:if="${user.blacklisted}">
+                        <button type="submit" class="btn btn-sm btn-secondary">移出黑名单</button>
+                    </form>
                 </td>
             </tr>
         </tbody>
     </table>
 </div>
+
+<!-- 编辑用户模态框 -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editUserModalLabel">编辑用户</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form th:action="@{/admin/users/edit}" method="post">
+                <div class="modal-body">
+                    <input type="hidden" id="userId" name="id">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">用户名</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">邮箱</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="blacklisted" name="blacklisted">
+                        <label class="form-check-label" for="blacklisted">加入黑名单</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 引入Bootstrap JS -->
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script>
+    // 编辑按钮点击事件处理
+    document.querySelectorAll('.btn-warning').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const userId = this.getAttribute('href').split('/').pop();
+            const row = this.closest('tr');
+            const username = row.querySelector('td:first-child').textContent;
+            const email = row.querySelector('td:nth-child(2)').textContent;
+            const blacklisted = row.querySelector('.btn-secondary') !== null;
+
+            document.getElementById('userId').value = userId;
+            document.getElementById('username').value = username;
+            document.getElementById('email').value = email;
+            document.getElementById('blacklisted').checked = blacklisted;
+
+            const editModal = new bootstrap.Modal(document.getElementById('editUserModal'));
+            editModal.show();
+        });
+    });
+
+    // 处理编辑表单提交
+    document.querySelector('#editUserModal form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const userId = formData.get('id');
+        const isBlacklisted = formData.get('blacklisted') === 'on';
+
+        // 根据黑名单状态选择不同的API端点
+        const endpoint = isBlacklisted ? `/admin/users/${userId}/blacklist` : `/admin/users/${userId}/unblacklist`;
+
+        fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id: userId,
+                username: formData.get('username'),
+                email: formData.get('email'),
+                blacklisted: isBlacklisted
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('更新用户信息失败：' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('更新用户信息时发生错误');
+            console.error('Error:', error);
+        });
+    });
+</script>
 </body>
 </html>

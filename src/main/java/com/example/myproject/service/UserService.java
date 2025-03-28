@@ -78,4 +78,28 @@ public class UserService implements UserDetailsService {
     public User updateUser(User user) {
         return userRepository.save(user);
     }
+
+    public void addToBlacklist(Long userId) throws Exception {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (!optionalUser.isPresent()) {
+            throw new Exception("用户不存在");
+        }
+        User user = optionalUser.get();
+        user.setBlacklisted(true);
+        userRepository.save(user);
+    }
+
+    public void removeFromBlacklist(Long userId) throws Exception {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (!optionalUser.isPresent()) {
+            throw new Exception("用户不存在");
+        }
+        User user = optionalUser.get();
+        user.setBlacklisted(false);
+        userRepository.save(user);
+    }
+
+    public List<User> getBlacklistedUsers() {
+        return userRepository.findByBlacklistedTrue();
+    }
 }

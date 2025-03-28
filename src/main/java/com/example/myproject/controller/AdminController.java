@@ -60,4 +60,22 @@ public class AdminController {
         userService.deleteUser(id);
         return "redirect:/admin/users";
     }
+
+    @GetMapping("/blacklist")
+    public String viewBlacklist(Model model) {
+        model.addAttribute("users", userService.getBlacklistedUsers());
+        return "admin/blacklist";
+    }
+
+    @PostMapping("/users/{id}/blacklist")
+    public String addToBlacklist(@PathVariable Long id) throws Exception {
+        userService.addToBlacklist(id);
+        return "redirect:/admin/users";
+    }
+
+    @PostMapping("/users/{id}/unblacklist")
+    public String removeFromBlacklist(@PathVariable Long id) throws Exception {
+        userService.removeFromBlacklist(id);
+        return "redirect:/admin/blacklist";
+    }
 }
