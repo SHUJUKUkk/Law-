@@ -102,4 +102,21 @@ public class UserService implements UserDetailsService {
     public List<User> getBlacklistedUsers() {
         return userRepository.findByBlacklistedTrue();
     }
+
+    public List<User> findNormalUsers() {
+        return userRepository.findByBlacklistedFalse();
+    }
+
+    public List<User> findBlacklistedUsers() {
+        return userRepository.findByBlacklistedTrue();
+    }
+
+    public User findByUsername(String username) {
+        try {
+            return userRepository.findByUsername(username)
+                    .orElse(null);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

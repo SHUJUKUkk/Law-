@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -16,14 +17,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserService userService;
     private final CustomAuthenticationSuccessHandler successHandler;
     private final PasswordEncoder passwordEncoder;
+    private final BlacklistAuthenticationFilter blacklistAuthenticationFilter;
 
     @Autowired
     public SecurityConfig(UserService userService,
                           CustomAuthenticationSuccessHandler successHandler,
-                          PasswordEncoder passwordEncoder) {
+                          PasswordEncoder passwordEncoder,
+                          BlacklistAuthenticationFilter blacklistAuthenticationFilter) {
         this.userService = userService;
         this.successHandler = successHandler;
         this.passwordEncoder = passwordEncoder;
+        this.blacklistAuthenticationFilter = blacklistAuthenticationFilter;
     }
 
     @Override
@@ -43,7 +47,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .and()
                 .logout()
-                .permitAll();
+                .logoutSuccessUrl("/auth/login")
+                .permitAll()
+                .and()
+                .addFilterBefore(blacklistAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     @Override

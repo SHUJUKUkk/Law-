@@ -63,7 +63,8 @@ public class AdminController {
 
     @GetMapping("/blacklist")
     public String viewBlacklist(Model model) {
-        model.addAttribute("users", userService.getBlacklistedUsers());
+        model.addAttribute("normalUsers", userService.findNormalUsers());
+        model.addAttribute("blacklistedUsers", userService.getBlacklistedUsers());
         return "admin/blacklist";
     }
 

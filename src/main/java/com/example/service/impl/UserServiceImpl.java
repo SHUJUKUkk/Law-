@@ -17,33 +17,22 @@ import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
+    @Override
+    public List<User> findNormalUsers() {
+        try {
+            return userRepository.findByBlacklistedFalse();
+        } catch (Exception e) {
+            logger.error("查询正常用户列表时发生错误", e);
+            throw new DatabaseException("查询用户列表失败");
+        }
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Autowired
     private UserRepository userRepository;
 
-    @Override
-    @PreAuthorize("hasRole('ADMIN')")
-    public List<User> findNormalUsers() {
-        try {
-            return userRepository.findByBlacklistedFalse();
-        } catch (Exception e) {
-            logger.error("获取普通用户列表失败", e);
-            throw new DatabaseException("获取用户列表时发生错误");
-        }
-    }
-
-    @Override
-    @PreAuthorize("hasRole('ADMIN')")
-    public List<User> findBlacklistedUsers() {
-        try {
-            return userRepository.findByBlacklistedTrue();
-        } catch (Exception e) {
-            logger.error("获取黑名单用户列表失败", e);
-            throw new DatabaseException("获取黑名单用户列表时发生错误");
-        }
-    }
+  
 
     @Override
     @Transactional
@@ -89,6 +78,15 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public List<User> findBlacklistedUsers() {
+        try {
+            return userRepository.findByBlacklistedTrue();
+        } catch (Exception e) {
+            logger.error("查询黑名单用户列表时发生错误", e);
+            throw new DatabaseException("查询用户列表失败");
+        }
+    }
     @Override
     public User findByUsername(String username) {
         try {
