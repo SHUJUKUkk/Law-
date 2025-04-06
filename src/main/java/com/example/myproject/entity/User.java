@@ -2,13 +2,12 @@ package com.example.myproject.entity;
 
 import javax.persistence.*;
 import lombok.Data;
-
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import java.util.Collection;
-import java.util.Collections;
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Data
@@ -29,14 +28,39 @@ public class User implements UserDetails {
     @Column(unique = true, nullable = false)
     private String email;
 
-    // 存储角色，例如 "ROLE_ADMIN", "ROLE_USER"
     @Column(nullable = false)
-    private String roles;
+    private String name;
+
+    @Column
+    private String phone;
+
+    @Column(name = "is_blacklisted", nullable = false, columnDefinition = "boolean default false")
+    private boolean blacklisted = false;
+
+    @Column(nullable = false)
+    private String roles = "USER";
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        String[] roleArray = roles.split(",");
-        return Arrays.stream(roleArray)
+        return Arrays.stream(roles.split(","))
+                .map(String::trim)
                 .map(role -> role.startsWith("ROLE_") ? role : "ROLE_" + role)
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());

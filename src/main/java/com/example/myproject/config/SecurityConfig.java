@@ -29,7 +29,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()  // 禁用 CSRF（测试阶段使用）
+                .csrf().disable()  // 禁用 CSRF（测试阶段）
                 .authorizeRequests()
                 .antMatchers("/auth/**").permitAll()
                 .antMatchers("/admin/**").hasRole("ADMIN")
@@ -40,6 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .loginPage("/auth/login")
                 .loginProcessingUrl("/auth/login")
                 .successHandler(successHandler)
+                .failureUrl("/auth/login?error=true") // 登录失败后自动重定向至该 URL
                 .permitAll()
                 .and()
                 .logout()
